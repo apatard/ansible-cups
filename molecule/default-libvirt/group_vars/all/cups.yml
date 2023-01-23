@@ -1,0 +1,27 @@
+---
+cups_listen:
+- "{{ ansible_all_ipv4_addresses | first }}:631"
+- "localhost:631"
+- "/run/cups/cups.sock"
+cups_browsing: "Off"
+cups_locations:
+- name: "/"
+  cfg:
+    "Order": "deny,allow"
+    Allow:
+    - "All"
+- name: "/admin"
+  cfg:
+    "Order": "deny,allow"
+    Allow:
+    - "All"
+- name: "/admin/conf"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"
+- name: "/admin/log"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"

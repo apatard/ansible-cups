@@ -1,0 +1,58 @@
+LogLevel {{ cups_loglevel }}
+PageLogFormat {{ cups_pagelogformat }}
+MaxLogSize {{ cups_maxlogsize }}
+ErrorPolicy {{ cups_errorpolicy }}
+{% for l in cups_listen %}
+Listen {{ l }}
+{% endfor %}
+{% if cups_ssl_listen | length > 0 %}
+{% for l in cups_ssl_listen %}
+SSLListen {{ l }}
+{% endfor %}
+{% endif %}
+{% if cups_server_name is not none %}
+ServerName {{ cups_server_name }}
+{% endif %}
+{% if cups_server_alias is not none %}
+ServerAlias {{ cups_server_alias }}
+{% endif %}
+Browsing {{ cups_browsing }}
+BrowseLocalProtocols {{ cups_browselocalprotocols }}
+DefaultAuthType {{ cups_defaultauthtype }}
+WebInterface {{ cups_webiface }}
+{% if cups_extra_cfg | length > 0 %}{% for k,v in cups_extra_cfg.items() %}
+{{ k }} {{ v }}
+{% endfor %}{% endif %}
+{% for location in cups_locations %}
+<Location {{ location.name }}>
+{% for k,v in location.cfg.items() %}
+{% if k == "Allow" or k == "Deny" %}{% for desc in v %}
+  {{ k }} {{ desc }}
+{% endfor %}
+{% else %}
+  {{ k }} {{ v }}
+{% endif %}
+{% endfor %}
+</Location>
+{% endfor %}
+{% for policy in cups_policies %}
+<Policy {{ policy.name }}>
+  JobPrivateAccess {{ policy.jobprivateaccess }}
+  JobPrivateValues {{ policy.jobprivatevalues }}
+  SubscriptionPrivateAccess {{ policy.subscriptionprivateaccess }}
+  SubscriptionPrivateValues {{ policy.subscriptionprivatevalues }}
+{% for limit in policy.limits %}
+  <Limit {{ limit.name }}>
+{% for k,v in limit.cfg.items() %}
+{% if k == "Allow" or k == "Deny" %}{% for desc in v %}
+    {{ k }} {{ desc }}
+{% endfor %}
+{% else %}
+    {{ k }} {{ v }}
+{% endif %}
+{% endfor %}
+  </Limit>
+{% endfor %}
+</Policy>
+{% endfor %}
+{% if cups_default_encryption is defined %}DefaultEncryption {{ cups_default_encryption }}{% endif %}

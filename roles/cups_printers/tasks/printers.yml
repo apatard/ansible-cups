@@ -1,0 +1,58 @@
+---
+- name: "Add {{ item.name }} printer"  # noqa name[template]
+  apatard.cups.cups_printer:
+    name: "{{ item.name }}"
+    device_uri: "{{ item.uri }}"
+    server: "{{ item.server }}"
+    port: "{{ item.port | default(omit) }}"
+    ssl: "{{ item.ssl | default(omit) }}"
+    login: "{{ item.login }}"
+    password: "{{ item.password }}"
+    ppdname: "{{ item.ppd | default(omit) }}"
+    location: "{{ item.location | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+
+- name: "Configure {{ item.name }}"  # noqa key-order[task] name[template]
+  block:
+  # has to be done connecting to localhost as cups is likely
+  # to return an error when trying to set option for an external
+  # ip on a non-shared printer
+  - name: "Set {{ item.name }} sharing"  # noqa name[template]
+    apatard.cups.cups_pr_options:
+      name: "{{ item.name }}"
+      server: localhost
+      login: "{{ item.login }}"
+      password: "{{ item.password }}"
+      options:
+        shared: "{{ item.shared | default(omit) }}"
+    no_log: true
+    notify: Restart cups
+
+  - name: "Set {{ item.name }} options"  # noqa name[template]
+    apatard.cups.cups_pr_options:
+      name: "{{ item.name }}"
+      server: "{{ item.server }}"
+      port: "{{ item.port | default(omit) }}"
+      ssl: "{{ item.ssl | default(omit) }}"
+      login: "{{ item.login }}"
+      password: "{{ item.password }}"
+      options:
+        enabled: "{{ item.enabled | default(omit) }}"
+        accept_jobs: "{{ item.accept_jobs | default(omit) }}"
+        allowed_users: "{{ item.allowed_users | default(omit) }}"
+    no_log: true
+    notify: Restart cups
+
+  - name: "Set {{ item.name }} as default"  # noqa name[template]
+    apatard.cups.cups_default_printer:
+      name: "{{ item.name }}"
+      server: "{{ item.server }}"
+      port: "{{ item.port | default(omit) }}"
+      ssl: "{{ item.ssl | default(omit) }}"
+      login: "{{ item.login }}"
+      password: "{{ item.password }}"
+    no_log: true
+    when: item.default is defined and (item.default | bool)
+    notify: Restart cups
+
+  when: item.state is not defined or item.state == 'absent'

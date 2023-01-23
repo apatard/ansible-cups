@@ -1,0 +1,14 @@
+---
+cups_printers_list:
+- name: PDF
+  uri: 'cups-pdf:/'
+  server: "instance-cups-ssl-libvirt"
+  port: 632
+  ssl: true
+  login: root
+  password: vagrant
+  location: "Nowhere"
+  enabled: true
+  accept_jobs: true
+  shared: true
+  allowed_users: ['vagrant', 'root']

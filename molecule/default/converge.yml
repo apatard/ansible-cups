@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  become: yes
+  roles:
+  - apatard.cups.cups
+  - apatard.cups.cups_printers

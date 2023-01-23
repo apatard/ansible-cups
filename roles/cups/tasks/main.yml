@@ -1,0 +1,14 @@
+---
+- name: Install packages
+  ansible.builtin.include_tasks: cups-pkgs.yml
+
+- name: Configure cups
+  ansible.builtin.include_tasks: cups.yml
+
+- name: Configure cups-browsed
+  ansible.builtin.include_tasks: cups-browsed.yml
+  when: cups_browsing | bool
+
+- name: Configure cups-pdf
+  ansible.builtin.include_tasks: cups-pdf.yml
+  when: cups_cups_pdf | bool

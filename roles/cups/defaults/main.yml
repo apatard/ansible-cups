@@ -1,0 +1,141 @@
+---
+cups_cups_pdf: true
+cups_loglevel: warn
+cups_pagelogformat: ""
+cups_maxlogsize: 0
+cups_errorpolicy: "retry-job"
+cups_listen:
+- "localhost:631"
+- "/run/cups/cups.sock"
+cups_browsing: "On"
+cups_browselocalprotocols: "dnssd"
+cups_defaultauthtype: "Basic"
+cups_webiface: "Yes"
+cups_extra_cfg: {}
+cups_locations:
+- name: "/"
+  cfg:
+    "Order": "allow,deny"
+- name: "/admin"
+  cfg:
+    "Order": "allow,deny"
+- name: "/admin/conf"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"
+- name: "/admin/log"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"
+cups_policies:
+- name: default
+  jobprivateaccess: default
+  jobprivatevalues: default
+  subscriptionprivateaccess: default
+  subscriptionprivatevalues: default
+  limits:
+  - name: "Create-Job Print-Job Print-URI Validate-Job"
+    cfg:
+      Order: "deny,allow"
+  - name: "Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job Cancel-My-Jobs Close-Job CUPS-Move-Job CUPS-Get-Document"
+    cfg:
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: "CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default CUPS-Get-Devices"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After Cancel-Jobs CUPS-Accept-Jobs CUPS-Reject-Jobs"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Cancel-Job CUPS-Authenticate-Job"
+    cfg:
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: "All"
+    cfg:
+      Order: "deny,allow"
+
+- name: authenticated
+  jobprivateaccess: default
+  jobprivatevalues: default
+  subscriptionprivateaccess: default
+  subscriptionprivatevalues: default
+  limits:
+  - name: "Create-Job Print-Job Print-URI Validate-Job"
+    cfg:
+      AuthType: Default
+      Order: "deny,allow"
+  - name: "Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job Cancel-My-Jobs Close-Job CUPS-Move-Job CUPS-Get-Document"
+    cfg:
+      AuthType: Default
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: "CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default CUPS-Get-Devices"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After Cancel-Jobs CUPS-Accept-Jobs CUPS-Reject-Jobs"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Cancel-Job CUPS-Authenticate-Job"
+    cfg:
+      AuthType: Default
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: All
+    cfg:
+      Order: "deny,allow"
+- name: kerberos
+  jobprivateaccess: default
+  jobprivatevalues: default
+  subscriptionprivateaccess: default
+  subscriptionprivatevalues: default
+  limits:
+  - name: "Create-Job Print-Job Print-URI Validate-Job"
+    cfg:
+      AuthType: Negotiate
+      Order: "deny,allow"
+  - name: "Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job Cancel-My-Jobs Close-Job CUPS-Move-Job CUPS-Get-Document"
+    cfg:
+      AuthType: Negotiate
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: "CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After Cancel-Jobs CUPS-Accept-Jobs CUPS-Reject-Jobs"
+    cfg:
+      AuthType: Default
+      Require: "user @SYSTEM"
+      Order: "deny,allow"
+  - name: "Cancel-Job CUPS-Authenticate-Job"
+    cfg:
+      AuthType: Negotiate
+      Require: "user @OWNER @SYSTEM"
+      Order: "deny,allow"
+  - name: All
+    cfg:
+      Order: "deny,allow"
+cups_browsed: false
+cups_system_group: lpadmin
+cups_log_file_group: adm
+cups_log_files:
+  access: /var/log/cups/access_log
+  error: /var/log/cups/error_log
+  page: /var/log/cups/page_log
+cups_create_selfsigned_certs: true
+cups_server_cert: null
+cups_ssl_listen: []
+cups_server_alias: null
+cups_server_name: null

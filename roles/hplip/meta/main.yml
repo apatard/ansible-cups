@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: Arnaud Patard
+  description: installs hplip
+  company: hupstream
+  license: GPLv3
+  min_ansible_version: "2.13"
+  platforms:
+  - name: Debian
+    versions:
+    - bullseye
+  galaxy_tags: []
+dependencies: []

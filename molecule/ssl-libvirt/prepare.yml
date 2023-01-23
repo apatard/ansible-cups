@@ -1,0 +1,99 @@
+---
+- name: Update apt cache
+  hosts: all
+  become: yes
+  tasks:
+  - name: Update apt cache
+    ansible.builtin.apt:
+      update_cache: yes
+
+# cups will complain if connecting with fqdn from local interfaces
+# so ensure fqdn points to ipv4 address
+- name: Ensure ip points to hostname
+  hosts: all
+  become: yes
+  tasks:
+  - name: Add line for hostname
+    ansible.builtin.lineinfile:
+      path: /etc/hosts
+      regexp: '^[^ ]+ {{ ansible_fqdn }} {{ ansible_hostname }}$'
+      line: "{{ ansible_all_ipv4_addresses | first }} {{ ansible_fqdn }} {{ ansible_hostname }}"
+      owner: root
+      group: root
+      mode: '0644'
+
+# https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html
+- name: Create certificates
+  hosts: all
+  become: yes
+  tasks:
+  - name: Install python cryptography
+    ansible.builtin.package:
+      name: python3-cryptography
+      state: present
+
+  - name: Look for ca cert
+    ansible.builtin.stat:
+      path: /etc/ssl/certs/test-ca.pem
+    register: ca_cert_stat
+
+  - name: Generate CA cert and key  # noqa key-order[task]
+    block:
+    - name: Create private key
+      community.crypto.openssl_privatekey:
+        path: /etc/ssl/private/test-ca.key
+
+    - name: Create certificate signing request (CSR) for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: /etc/ssl/private/test-ca.key
+        common_name: Test CA
+        use_common_name_for_san: false
+        basic_constraints:
+        - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+        - keyCertSign
+        key_usage_critical: true
+      register: ca_csr
+
+    - name: Create self-signed CA certificate from CSR
+      community.crypto.x509_certificate:
+        path: /usr/local/share/ca-certificates/test-ca.crt
+        csr_content: "{{ ca_csr.csr }}"
+        privatekey_path: /etc/ssl/private/test-ca.key
+        provider: selfsigned
+      register: client_crt
+
+    - name: Run update certs
+      ansible.builtin.command: update-ca-certificates
+      when: client_crt is changed
+
+    when: not ca_cert_stat.stat.exists
+
+  - name: Look for server cert
+    ansible.builtin.stat:
+      path: "/root/server.pem"
+    register: server_cert_stat
+
+  - name: Generate CA cert and key  # noqa key-order[task]
+    block:
+    - name: Create server private key
+      community.crypto.openssl_privatekey:
+        path: "/root/server.key"
+
+    - name: Create certificate signing request (CSR) for CA certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "/root/server.key"
+        common_name: "{{ ansible_hostname }}"
+        use_common_name_for_san: false
+        subject_alt_name: "DNS:{{ ansible_fqdn }}"
+      register: client_csr
+
+    - name: Generate server cert
+      community.crypto.x509_certificate:
+        path: "/root/server.pem"
+        csr_content: "{{ client_csr.csr }}"
+        ownca_path: /etc/ssl/certs/test-ca.pem
+        ownca_privatekey_path: /etc/ssl/private/test-ca.key
+        provider: ownca
+    when: not server_cert_stat.stat.exists

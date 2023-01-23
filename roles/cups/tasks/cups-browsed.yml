@@ -1,0 +1,10 @@
+---
+- name: Enable/Disable cups browsed
+  ansible.builtin.service:
+    name: cups-browsed
+    enabled: "{{ cups_browsed | bool }}"
+
+- name: Start/Stop cups browsed
+  ansible.builtin.service:
+    name: cups-browsed
+    state: "{{ cups_browsed | bool | ternary('started', 'stopped') }}"

@@ -1,0 +1,22 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
+platforms:
+- name: instance-cups-${MOLECULE_SCENARIO_NAME}
+  box: ${MOL_BOX:-debian/bullseye64}
+provisioner:
+  name: ansible
+  # config_options:
+  #   ssh_connection:
+  #     pipelining: true
+verifier:
+  name: testinfra

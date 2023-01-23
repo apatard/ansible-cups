@@ -1,0 +1,15 @@
+---
+- name: Install cups
+  ansible.builtin.package:
+    name: cups
+    state: present
+
+- name: Install cups-pdf
+  ansible.builtin.package:
+    name: cups-pdf
+    state: "{{ cups_cups_pdf | bool | ternary('present', 'absent') }}"
+
+- name: Install cups-browsed
+  ansible.builtin.package:
+    name: cups-browsed
+    state: "{{ cups_browsing | bool | ternary('present', 'absent') }}"

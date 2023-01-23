@@ -1,0 +1,16 @@
+---
+namespace: apatard
+name: cups
+version: 0.0.1
+readme: README.md
+authors:
+- Arnaud Patard <apatard@hupstream.com>
+
+
+description: Collection to configure CUPS
+license:
+- GPL-3.0-or-later
+tags: []
+dependencies: {}
+repository: http://github.com/apatard/ansible-cups
+build_ignore: []

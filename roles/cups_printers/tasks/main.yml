@@ -1,0 +1,13 @@
+---
+- name: Install pycups
+  ansible.builtin.package:
+    name: python3-cups
+    state: present
+
+- name: Add printers
+  ansible.builtin.include_tasks: printers.yml
+  with_items: "{{ cups_printers_list }}"
+  when: cups_printers_list | length > 0
+
+- name: Force handler reload now to force saving updated cups configuration files.
+  ansible.builtin.meta: flush_handlers

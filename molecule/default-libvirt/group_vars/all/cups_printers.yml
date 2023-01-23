@@ -1,0 +1,12 @@
+---
+cups_printers_list:
+- name: PDF
+  uri: 'cups-pdf:/'
+  server: localhost
+  login: root
+  password: vagrant
+  location: "Nowhere"
+  enabled: true
+  accept_jobs: true
+  shared: false
+  allowed_users: ['vagrant', 'root']

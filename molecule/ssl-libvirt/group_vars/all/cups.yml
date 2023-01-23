@@ -1,0 +1,46 @@
+---
+cups_loglevel: debug
+cups_ssl_listen:
+- "{{ ansible_all_ipv4_addresses | first }}:632"
+cups_listen:
+- "{{ ansible_all_ipv4_addresses | first }}:631"
+- "localhost:631"
+- "/run/cups/cups.sock"
+cups_browsing: "Off"
+cups_locations:
+- name: "/"
+  cfg:
+    "Order": "deny,allow"
+    Allow:
+    - "All"
+- name: "/admin"
+  cfg:
+    "Order": "deny,allow"
+    Allow:
+    - "All"
+- name: "/admin/conf"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"
+    Allow:
+    - "All"
+- name: "/admin/log"
+  cfg:
+    "AuthType": "Default"
+    "Require": "user @SYSTEM"
+    "Order": "allow,deny"
+    Allow:
+    - "All"
+
+cups_default_encryption: Required
+cups_create_selfsigned_certs: no
+cups_server_name: "{{ ansible_fqdn }}"
+cups_server_alias: "{{ ansible_hostname }}"
+cups_server_cert:
+  cert:
+    path: /root/server.pem
+    remote: true
+  key:
+    path: /root/server.key
+    remote: true

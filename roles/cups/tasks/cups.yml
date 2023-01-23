@@ -1,0 +1,89 @@
+---
+- name: Install cups
+  ansible.builtin.package:
+    name: cups
+    state: present
+
+- name: Copy certificate files  # noqa key-order[task]
+  block:
+  - name: Copy certificate
+    ansible.builtin.copy:
+      src: "{{ cups_server_cert.cert.path }}"
+      dest: "/etc/cups/ssl/{{ cups_server_name }}.crt"
+      owner: root
+      group: root
+      mode: 0644
+      remote_src: "{{ cups_server_cert.cert.remote | default(omit) }}"
+  - name: Copy certificate key
+    ansible.builtin.copy:
+      src: "{{ cups_server_cert.key.path }}"
+      dest: "/etc/cups/ssl/{{ cups_server_name }}.key"
+      owner: root
+      group: root
+      mode: 0600
+      remote_src: "{{ cups_server_cert.key.remote | default(omit) }}"
+  when: cups_server_cert is not none
+
+# don't use template validate: since apparmor will
+# get in our way and I dont want to create apparmor profile for that
+- name: Create cupsd configuration
+  block:
+  - name: Set cupsd.conf
+    ansible.builtin.template:
+      src: cupsd.conf.j2
+      dest: /etc/cups/cupsd.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: true
+    register: cups_template
+    notify: Restart cups
+  - name: Check configuration
+    ansible.builtin.command: cupsd -t -c /etc/cups/cupsd.conf
+    changed_when: False
+  rescue:
+  - name: Restore configuration
+    ansible.builtin.copy:
+      src: "{{ cups_template.backup_file }}"
+      dest: /etc/cupsd/cupsd.conf
+      remote_src: true
+      owner: root
+      group: root
+      mode: 0644
+    notify: Restart cups
+
+- name: Create cups-files configuration
+  block:
+  - name: Set cupsd.conf
+    ansible.builtin.template:
+      src: cups-files.conf.j2
+      dest: /etc/cups/cups-files.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: true
+    register: cups_template
+    notify: Restart cups
+  # cups will check bock cupsd and cups-files
+  - name: Check configuration
+    ansible.builtin.command: cupsd -t -c /etc/cups/cupsd.conf
+    changed_when: False
+  rescue:
+  - name: Restore configuration
+    ansible.builtin.copy:
+      src: "{{ cups_template.backup_file }}"
+      dest: /etc/cupsd/cups-files.conf
+      remote_src: true
+      owner: root
+      group: root
+      mode: 0644
+    notify: Restart cups
+
+- name: Enable cups service
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+  with_items:
+  - cups.service
+  - cups.socket
+  - cups.path

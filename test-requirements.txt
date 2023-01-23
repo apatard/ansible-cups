@@ -1,0 +1,10 @@
+ansible-core
+pytest
+mock
+pytest-xdist
+pytest-forked
+pytest-testinfra
+molecule
+molecule-vagrant
+molecule-podman
+ansible-lint

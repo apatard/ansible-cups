@@ -45,7 +45,7 @@ options:
      required: true
    options:
      description:
-        - dictionnary of options to set
+        - dictionary of options to set
      required: true
 
 """
@@ -190,8 +190,8 @@ def main():
         argument_spec=dict(
             name=dict(required=True),
             server=dict(required=True),
-            port=dict(required=False, default=631, type='int'),
-            ssl=dict(required=False, default=False, type='bool'),
+            port=dict(required=False, default=631, type="int"),
+            ssl=dict(required=False, default=False, type="bool"),
             login=dict(required=True),
             password=dict(required=True, no_log=True),
             options=dict(type="dict", required=True),

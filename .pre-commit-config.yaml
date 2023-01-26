@@ -77,3 +77,4 @@ repos:
   hooks:
   - id: detect-secrets
     exclude: README.md
+    args: ['--exclude-files', 'molecule/*']

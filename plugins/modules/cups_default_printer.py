@@ -81,8 +81,8 @@ def main():
         argument_spec=dict(
             name=dict(required=True),
             server=dict(required=True),
-            port=dict(required=False, default=631, type='int'),
-            ssl=dict(required=False, default=False, type='bool'),
+            port=dict(required=False, default=631, type="int"),
+            ssl=dict(required=False, default=False, type="bool"),
             login=dict(required=True),
             password=dict(required=True, no_log=True),
         ),

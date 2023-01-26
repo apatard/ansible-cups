@@ -4,7 +4,8 @@ import pytest
 import testinfra.utils.ansible_runner
 
 testinfra_hosts = testinfra.utils.ansible_runner.AnsibleRunner(
-    os.environ['MOLECULE_INVENTORY_FILE']).get_hosts('all')
+    os.environ["MOLECULE_INVENTORY_FILE"]
+).get_hosts("all")
 
 
 def test_package(host):
@@ -12,11 +13,7 @@ def test_package(host):
     assert pkg.is_installed
 
 
-@pytest.mark.parametrize("name", [
-    ("cups.service"),
-    ("cups.path"),
-    ("cups.socket")
-])
+@pytest.mark.parametrize("name", [("cups.service"), ("cups.path"), ("cups.socket")])
 def test_svc(host, name):
     with host.sudo():
         s = host.service(name)
